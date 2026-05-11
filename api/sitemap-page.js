@@ -5,8 +5,6 @@ export default async function handler(req) {
   const host = new URL(req.url).host;
   const today = new Date().toISOString().split("T")[0];
 
-  // Extract page number from URL e.g. /sitemap-jobs-3.xml → 3
-  // Also handle /sitemap-main.xml
   const mainMatch = pathname.includes("sitemap-main");
   const pageMatch = pathname.match(/sitemap-jobs-(\d+)\.xml/);
 
@@ -25,9 +23,7 @@ export default async function handler(req) {
     });
   }
 
-  if (!pageMatch) {
-    return new Response("Not found", { status: 404 });
-  }
+  if (!pageMatch) return new Response("Not found", { status: 404 });
 
   const page = parseInt(pageMatch[1]);
   const sitemapUrl = page === 1
@@ -39,7 +35,11 @@ export default async function handler(req) {
     const timer = setTimeout(() => controller.abort(), 10000);
 
     const res = await fetch(sitemapUrl, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)",
+        "Accept-Encoding": "gzip, deflate, br", // ✅ accept compressed
+        "Accept": "application/xml, text/xml, */*",
+      },
       redirect: "follow",
       signal: controller.signal,
     });
@@ -47,8 +47,40 @@ export default async function handler(req) {
 
     if (!res.ok) throw new Error("Failed: " + res.status);
 
-    const xml = await res.text();
-    const locs    = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)].map(m => m[1].trim());
+    // ✅ Use arrayBuffer + DecompressionStream to handle gzip
+    const buffer = await res.arrayBuffer();
+    let xml = "";
+
+    const contentEncoding = res.headers.get("content-encoding") || "";
+    const contentType = res.headers.get("content-type") || "";
+
+    if (contentEncoding.includes("gzip") || contentType.includes("gzip") || contentType === "binary") {
+      // Decompress gzip
+      const ds = new DecompressionStream("gzip");
+      const stream = new Response(buffer).body.pipeThrough(ds);
+      const decompressed = await new Response(stream).arrayBuffer();
+      xml = new TextDecoder().decode(decompressed);
+    } else {
+      xml = new TextDecoder().decode(buffer);
+    }
+
+    // If still binary/empty, try raw text decode
+    if (!xml.includes("<loc>")) {
+      // Try deflate
+      try {
+        const ds2 = new DecompressionStream("deflate");
+        const stream2 = new Response(buffer).body.pipeThrough(ds2);
+        const decompressed2 = await new Response(stream2).arrayBuffer();
+        xml = new TextDecoder().decode(decompressed2);
+      } catch(e) {}
+    }
+
+    // If still no <loc>, try raw
+    if (!xml.includes("<loc>")) {
+      xml = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
+    }
+
+    const locs     = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)].map(m => m[1].trim());
     const lastmods = [...xml.matchAll(/<lastmod>([\s\S]*?)<\/lastmod>/gi)].map(m => m[1].trim());
 
     const urls = locs
@@ -76,8 +108,9 @@ ${urls.map(u => `  <url>
     });
 
   } catch(e) {
-    return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>`, {
-      headers: { "content-type": "application/xml; charset=utf-8" },
-    });
+    return new Response(
+      `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><!-- error: ${e.message} --></urlset>`,
+      { headers: { "content-type": "application/xml; charset=utf-8" } }
+    );
   }
 }
