@@ -20,35 +20,30 @@ export default async function handler(req) {
     const xml = await res.text();
     const jobs = [];
 
-    // Parse every <url> block
     const blocks = xml.split(/<url>/i).slice(1);
     for (const block of blocks) {
-      const loc      = (block.match(/<loc>([\s\S]*?)<\/loc>/i) || [])[1]?.trim();
-      const lastmod  = (block.match(/<lastmod>([\s\S]*?)<\/lastmod>/i) || [])[1]?.trim() || "";
+      const loc     = (block.match(/<loc>([\s\S]*?)<\/loc>/i) || [])[1]?.trim();
+      const lastmod = (block.match(/<lastmod>([\s\S]*?)<\/lastmod>/i) || [])[1]?.trim() || "";
       if (!loc || !loc.includes("/us/jobs/")) continue;
 
-      // Slug → title + company
-      const slug   = loc.split("/us/jobs/")[1] || "";
-      const parts  = slug.split("--");
-      const raw    = parts[0] || "";
+      const slug  = loc.split("/us/jobs/")[1] || "";
+      const parts = slug.split("--");
+      const raw   = parts[0] || "";
 
-      // Remove trailing source ID numbers from title part
-      const title  = raw
+      const title = raw
         .replace(/-\d+$/, "")
         .replace(/-/g, " ")
         .replace(/\b\w/g, c => c.toUpperCase())
         .trim();
 
-      // Company from second segment before numeric ID
-      const src    = parts[1] || "";
+      const src = parts[1] || "";
       const company = src
-        .replace(/-[\da-f]{8,}.*$/, "")   // remove hash IDs
+        .replace(/-[\da-f]{8,}.*$/, "")
         .replace(/-\d+$/, "")
         .replace(/-/g, " ")
         .replace(/\b\w/g, c => c.toUpperCase())
         .trim() || "BeBee";
 
-      // Search filter
       if (q && !title.toLowerCase().includes(q) && !company.toLowerCase().includes(q)) continue;
 
       jobs.push({ url: loc, title, company, lastmod });
@@ -63,9 +58,9 @@ export default async function handler(req) {
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message, jobs: [], page, total: 0 }), {
-      status: 500,
-      headers: { "content-type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: err.message, jobs: [], page, total: 0 }),
+      { status: 500, headers: { "content-type": "application/json" } }
+    );
   }
 }
