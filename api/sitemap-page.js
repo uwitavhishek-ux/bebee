@@ -5,7 +5,6 @@ export default async function handler(req) {
   const host = new URL(req.url).host;
   const today = new Date().toISOString().split("T")[0];
 
-  // /sitemap-main.xml
   if (pathname.includes("sitemap-main")) {
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -17,38 +16,61 @@ export default async function handler(req) {
   </url>
 </urlset>`;
     return new Response(xml, {
-      headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "s-maxage=86400" },
+      headers: { "content-type": "application/xml; charset=utf-8" },
     });
   }
 
-  // /sitemap-jobs-N.xml
   const pageMatch = pathname.match(/sitemap-jobs-(\d+)\.xml/);
   if (!pageMatch) return new Response("Not found", { status: 404 });
 
   const page = parseInt(pageMatch[1]);
 
+  // Fetch bebee sitemap directly — skip the /api/jobs middleman
+  const sitemapUrl = page === 1
+    ? "https://bebee.com/sitemaps/jobs/us"
+    : `https://bebee.com/sitemaps/jobs/us/${page}`;
+
   try {
-    // ✅ Fetch jobs from our own API endpoint
-    const apiUrl = `https://${host}/api/jobs?page=${page}`;
-    const res = await fetch(apiUrl, {
-      headers: { "User-Agent": "Mozilla/5.0" },
+    const res = await fetch(sitemapUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)",
+        "Accept": "*/*",
+      },
+      redirect: "follow",
     });
 
-    if (!res.ok) throw new Error("API fetch failed: " + res.status);
+    // Get raw bytes
+    const buffer = await res.arrayBuffer();
 
-    const data = await res.json();
-    const jobs = data.jobs || [];
+    // Try gzip first
+    let xml = "";
+    try {
+      const ds = new DecompressionStream("gzip");
+      const blob = new Blob([buffer]);
+      const stream = blob.stream().pipeThrough(ds);
+      xml = await new Response(stream).text();
+    } catch(e1) {
+      // Try raw text
+      try {
+        xml = new TextDecoder("utf-8", { fatal: false }).decode(buffer);
+      } catch(e2) {
+        xml = "";
+      }
+    }
+
+    // Extract locs
+    const locs     = [...xml.matchAll(/<loc>\s*(.*?)\s*<\/loc>/gi)].map(m => m[1]);
+    const lastmods = [...xml.matchAll(/<lastmod>\s*(.*?)\s*<\/lastmod>/gi)].map(m => m[1]);
+
+    const jobLocs = locs.filter(l => l.includes("/us/jobs/"));
 
     const out = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${jobs.map(job => {
-  // Rewrite bebee.com URL to our domain
-  const path = job.url.replace("https://bebee.com", "");
-  const loc  = `https://${host}${path}`;
-  const lastmod = job.lastmod || today;
+${jobLocs.map((loc, i) => {
+  const path = loc.replace("https://bebee.com", "");
   return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <loc>https://${host}${path}</loc>
+    <lastmod>${lastmods[i] || today}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>`;
@@ -59,6 +81,10 @@ ${jobs.map(job => {
       headers: {
         "content-type": "application/xml; charset=utf-8",
         "cache-control": "s-maxage=3600, stale-while-revalidate=7200",
+        "x-debug-status": String(res.status),
+        "x-debug-locs": String(jobLocs.length),
+        "x-debug-encoding": res.headers.get("content-encoding") || "none",
+        "x-debug-type": res.headers.get("content-type") || "none",
       },
     });
 
