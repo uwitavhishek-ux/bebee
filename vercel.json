@@ -1,7 +1,18 @@
 {
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap.js" },
-    { "source": "/api/jobs",    "destination": "/api/jobs.js"    },
-    { "source": "/(.*)",        "destination": "/api/index.js"   }
+    { "source": "/sitemap.xml",            "destination": "/api/sitemap.js"      },
+    { "source": "/sitemap-main.xml",       "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-1.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-2.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-3.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-4.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-5.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-6.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-7.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-8.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-9.xml",     "destination": "/api/sitemap-page.js" },
+    { "source": "/sitemap-jobs-10.xml",    "destination": "/api/sitemap-page.js" },
+    { "source": "/api/jobs",               "destination": "/api/jobs.js"         },
+    { "source": "/(.*)",                   "destination": "/api/index.js"        }
   ]
 }
