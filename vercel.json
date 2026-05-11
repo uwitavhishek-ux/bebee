@@ -13,6 +13,7 @@
     { "source": "/sitemap-jobs-9.xml",     "destination": "/api/sitemap-page.js" },
     { "source": "/sitemap-jobs-10.xml",    "destination": "/api/sitemap-page.js" },
     { "source": "/api/jobs",               "destination": "/api/jobs.js"         },
+    { "source": "/us/jobs/:slug",          "destination": "/api/job-detail.js"   },
     { "source": "/(.*)",                   "destination": "/api/index.js"        }
   ]
 }
