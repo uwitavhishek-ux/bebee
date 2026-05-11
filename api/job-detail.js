@@ -32,7 +32,6 @@ export default async function handler(req) {
       } catch(e) {}
     }
 
-    // Extract meta tags as fallback
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
     const descMatch  = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
 
@@ -45,7 +44,7 @@ export default async function handler(req) {
       ? jobPosting.employmentType.join(", ")
       : (jobPosting?.employmentType || "");
 
-    const addr    = jobPosting?.jobLocation?.address || jobPosting?.jobLocation?.[0]?.address || {};
+    const addr     = jobPosting?.jobLocation?.address || jobPosting?.jobLocation?.[0]?.address || {};
     const location = [addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean).join(", ") || "Remote · US";
 
     const salaryVal = jobPosting?.baseSalary?.value;
@@ -59,7 +58,7 @@ export default async function handler(req) {
       .trim()
       .substring(0, 5000);
 
-    // Use exact schema from bebee — injected in <head> invisibly
+    // Exact schema from bebee injected invisibly in <head>
     const schemaScript = jobPosting
       ? `<script type="application/ld+json">${JSON.stringify(jobPosting)}</script>`
       : "";
@@ -83,4 +82,94 @@ ${schemaScript}
 :root{--g:#00e676;--gm:#00c853;--gd:#007a33;--bg:#070d09;--bg2:#0c1510;--sur:#111d14;--bor:#1a2e1e;--tx:#e4f0e6;--mu:#5a8060}
 body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-weight:300;min-height:100vh}
 .hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,13,9,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bor)}
-.hdr-logo{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.
+.hdr-logo{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.03em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}
+.hdr-dot{width:7px;height:7px;background:var(--g);border-radius:50%;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+.hdr-back{font-size:.75rem;color:var(--mu);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}
+.hdr-back:hover{color:var(--g)}
+.wrap{max-width:860px;margin:0 auto;padding:96px 32px 80px}
+.breadcrumb{font-size:.72rem;color:var(--mu);margin-bottom:28px;display:flex;align-items:center;gap:8px}
+.breadcrumb a{color:var(--mu);text-decoration:none;transition:color .2s}
+.breadcrumb a:hover{color:var(--g)}
+.breadcrumb span{opacity:.4}
+.job-title{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.03em;color:#fff;line-height:1.15;margin-bottom:16px}
+.job-company{font-size:1rem;color:var(--g);font-weight:500;margin-bottom:18px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+.tag{padding:5px 14px;border-radius:100px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bor);color:var(--mu);background:var(--sur)}
+.tag.hl{border-color:var(--gd);color:var(--g);background:rgba(0,230,118,.07)}
+.apply-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:20px 24px;background:var(--bg2);border:1px solid var(--bor);border-radius:3px;margin-bottom:36px}
+.apply-btn{background:var(--g);color:var(--bg);border:none;padding:13px 28px;border-radius:2px;font-family:"Syne",sans-serif;font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.apply-btn:hover{background:var(--gm);transform:translateY(-1px)}
+.apply-note{font-size:.75rem;color:var(--mu);line-height:1.5}
+.section{background:var(--bg2);border:1px solid var(--bor);border-radius:3px;padding:28px;margin-bottom:16px}
+.section-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:"";width:16px;height:1px;background:var(--g)}
+.desc{font-size:.9rem;line-height:1.85;color:var(--tx)}
+footer{border-top:1px solid var(--bor);padding:32px;text-align:center;color:var(--mu);font-size:.75rem;margin-top:40px}
+footer a{color:var(--mu);text-decoration:none}
+footer a:hover{color:var(--g)}
+@media(max-width:600px){.hdr,.wrap,footer{padding-left:18px;padding-right:18px}.apply-bar{flex-direction:column;align-items:flex-start}.apply-btn{width:100%;text-align:center;justify-content:center}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <a href="/" class="hdr-logo"><span class="hdr-dot"></span>Unique Jobs</a>
+  <a href="/" class="hdr-back">← Back to jobs</a>
+</header>
+
+<div class="wrap">
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span>/</span>
+    <a href="/">Jobs</a>
+    <span>/</span>
+    <span>${title.substring(0, 60)}</span>
+  </div>
+
+  <h1 class="job-title">${title}</h1>
+  <div class="job-company">${company}</div>
+
+  <div class="tags">
+    ${empType ? `<span class="tag hl">${empType}</span>` : ""}
+    <span class="tag hl">Remote · US</span>
+    ${location !== "Remote · US" ? `<span class="tag">${location}</span>` : ""}
+    ${salary ? `<span class="tag hl">${salary}</span>` : ""}
+    ${datePosted ? `<span class="tag">Posted: ${datePosted}</span>` : ""}
+    ${validThrough ? `<span class="tag">Until: ${validThrough}</span>` : ""}
+  </div>
+
+  <div class="apply-bar">
+    <a class="apply-btn" href="${bebeeUrl}" target="_blank" rel="noopener">Apply Now →</a>
+    <div class="apply-note">
+      You will be redirected to the original job posting on BeBee.<br/>
+      Apply directly with the employer.
+    </div>
+  </div>
+
+  ${cleanDesc ? `
+  <div class="section">
+    <div class="section-title">Job Description</div>
+    <div class="desc">${cleanDesc.replace(/\n/g, "<br/>")}</div>
+  </div>` : ""}
+</div>
+
+<footer>
+  <a href="/">Unique Jobs</a> &bull; US Remote Jobs &bull; &copy; 2026
+</footer>
+</body>
+</html>`;
+
+    return new Response(page, {
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+
+  } catch(e) {
+    return new Response(`<!DOCTYPE html><html><body style="background:#070d09;color:#e4f0e6;font-family:sans-serif;padding:40px">
+      <h1 style="color:#00e676">Error loading job</h1>
+      <p>${e.message}</p>
+      <a href="/" style="color:#00e676">← Back to jobs</a>
+    </body></html>`, {
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+  }
+}
