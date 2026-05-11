@@ -1,40 +1,51 @@
-export const config = { runtime: "edge" };
+export const config = { 
+  runtime: "edge",
+  maxDuration: 30,
+};
 
 export default async function handler(req) {
   const host = new URL(req.url).host;
-  const allUrls = [];
+  const today = new Date().toISOString().split("T")[0];
 
-  for (let page = 1; page <= 10; page++) {
-    try {
-      const sitemapUrl = page === 1
+  // Fetch all 10 pages IN PARALLEL with a 5s timeout each
+  const pages = Array.from({ length: 10 }, (_, i) => i + 1);
+
+  const results = await Promise.allSettled(
+    pages.map(async (page) => {
+      const url = page === 1
         ? "https://bebee.com/sitemaps/jobs/us"
         : `https://bebee.com/sitemaps/jobs/us/${page}`;
 
-      const res = await fetch(sitemapUrl, {
-        headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
-        redirect: "follow",
-      });
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 5000);
 
-      if (!res.ok) continue;
-
-      const xml = await res.text();
-
-      const locs    = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)].map(m => m[1].trim());
-      const lastmods = [...xml.matchAll(/<lastmod>([\s\S]*?)<\/lastmod>/gi)].map(m => m[1].trim());
-
-      locs.forEach((loc, i) => {
-        if (!loc.includes("/us/jobs/")) return;
-        const path = loc.replace("https://bebee.com", "");
-        allUrls.push({
-          loc: `https://${host}${path}`,
-          lastmod: lastmods[i] || new Date().toISOString().split("T")[0],
+      try {
+        const res = await fetch(url, {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)" },
+          redirect: "follow",
+          signal: controller.signal,
         });
-      });
+        clearTimeout(timer);
+        if (!res.ok) return [];
 
-    } catch(e) {}
-  }
+        const xml = await res.text();
+        const locs    = [...xml.matchAll(/<loc>([\s\S]*?)<\/loc>/gi)].map(m => m[1].trim());
+        const lastmods = [...xml.matchAll(/<lastmod>([\s\S]*?)<\/lastmod>/gi)].map(m => m[1].trim());
 
-  const today = new Date().toISOString().split("T")[0];
+        return locs
+          .filter(loc => loc.includes("/us/jobs/"))
+          .map((loc, i) => ({
+            loc: `https://${host}${loc.replace("https://bebee.com", "")}`,
+            lastmod: lastmods[i] || today,
+          }));
+      } catch(e) {
+        clearTimeout(timer);
+        return [];
+      }
+    })
+  );
+
+  const allUrls = results.flatMap(r => r.status === "fulfilled" ? r.value : []);
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
