@@ -425,7 +425,7 @@ function render(list) {
       </div>
       <div class="card-right">
         <span class="badge \${isNew?"new":""}"> \${isNew?"New":"Remote"}</span>
-        <a class="card-apply" href="\${esc(job.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply →</a>
+        <a class="card-apply" href="https://remotejob09.job4intern.com/pages/job-application" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply →</a>
       </div>
     </div>\`;
   }).join("");
