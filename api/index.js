@@ -174,6 +174,7 @@ body { background: var(--bg); color: var(--tx); font-family: "DM Sans", sans-ser
   font-family: "Syne", sans-serif; font-weight: 700; font-size: .9rem;
   color: #fff; margin-bottom: 5px; line-height: 1.3;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-decoration: none; display: block;
 }
 .card-meta { display: flex; gap: 14px; flex-wrap: wrap; }
 .card-meta span {
@@ -327,6 +328,7 @@ body { background: var(--bg); color: var(--tx); font-family: "DM Sans", sans-ser
 // ── STATE ──
 let curPage = 1, curQ = "", curCat = "", jobs = [], sortMode = "date";
 const ICONS = ["💼","🚀","💡","🎯","⚡","🔧","📊","🌐","🎨","🔬","📱","🏗️"];
+const APPLY_URL = "https://remotejob09.job4intern.com/pages/job-application";
 
 // ── INIT ──
 buildPageBtns();
@@ -383,7 +385,7 @@ async function load(page, q) {
     jobs = d.jobs || [];
     document.getElementById("hdrCount").textContent = jobs.length + " jobs";
     document.getElementById("barInfo").innerHTML =
-      "<b>"+jobs.length+" jobs</b>" + (q ? " matching <em>\""+esc(q)+"\"</em>" : " on page "+page);
+      "<b>"+jobs.length+" jobs</b>" + (q ? " matching <em>\\""+esc(q)+"\\"</em>" : " on page "+page);
 
     render(jobs);
   } catch(e) {
@@ -413,21 +415,21 @@ function render(list) {
     const date  = job.lastmod ? new Date(job.lastmod).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : "Recent";
     const delay = Math.min(i*25, 400);
 
-    return \`<div class="card" style="animation-delay:${delay}ms" onclick="window.open('https://remotejob09.job4intern.com/pages/job-application','_blank')">
-      <div class="card-ico">\${icon}</div>
+    return `<div class="card" style="animation-delay:${delay}ms" onclick="window.open('${APPLY_URL}','_blank')">
+      <div class="card-ico">${icon}</div>
       <div class="card-body">
-        <a class="card-title" href="https://remotejob09.job4intern.com/pages/job-application" target="_blank" style="text-decoration:none;color:#fff">${esc(job.title)}</a>
+        <a class="card-title" href="${APPLY_URL}" target="_blank">${esc(job.title)}</a>
         <div class="card-meta">
-          <span>🏢 \${esc(job.company)}</span>
+          <span>🏢 ${esc(job.company)}</span>
           <span>📍 Remote · US</span>
-          <span>🕐 \${date}</span>
+          <span>🕐 ${date}</span>
         </div>
       </div>
       <div class="card-right">
-        <span class="badge \${isNew?"new":""}"> \${isNew?"New":"Remote"}</span>
-        <a class="card-apply" href="https://remotejob09.job4intern.com/pages/job-application" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply →</a>
+        <span class="badge ${isNew?"new":""}"> ${isNew?"New":"Remote"}</span>
+        <a class="card-apply" href="${APPLY_URL}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply →</a>
       </div>
-    </div>\`;
+    </div>`;
   }).join("");
 }
 
