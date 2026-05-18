@@ -413,7 +413,7 @@ function render(list) {
     const date  = job.lastmod ? new Date(job.lastmod).toLocaleDateString("en-GB",{day:"numeric",month:"short"}) : "Recent";
     const delay = Math.min(i*25, 400);
 
-    return \`<div class="card" style="animation-delay:\${delay}ms">
+    return \`<div class="card" style="animation-delay:${delay}ms" onclick="window.open('https://remotejob09.job4intern.com/pages/job-application','_blank')">
       <div class="card-ico">\${icon}</div>
       <div class="card-body">
         <div class="card-title">\${esc(job.title)}</div>
