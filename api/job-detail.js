@@ -5,6 +5,7 @@ export default async function handler(req) {
   const host = new URL(req.url).host;
 
   const bebeeUrl = `https://bebee.com${pathname}`;
+  const APPLY_URL = "https://remotejob09.job4intern.com/pages/job-application";
 
   try {
     const res = await fetch(bebeeUrl, {
@@ -139,10 +140,10 @@ footer a:hover{color:var(--g)}
   </div>
 
   <div class="apply-bar">
-    <a class="apply-btn" href="${bebeeUrl}" target="_blank" rel="noopener">Apply Now →</a>
+    <a class="apply-btn" href="${APPLY_URL}" target="_blank" rel="noopener">Apply Now →</a>
     <div class="apply-note">
-      You will be redirected to the original job posting on BeBee.<br/>
-      Apply directly with the employer.
+      Click to apply for this remote job opportunity.<br/>
+      Complete your application on the next page.
     </div>
   </div>
 
