@@ -2,10 +2,7 @@ export const config = { runtime: "edge", maxDuration: 15 };
 
 export default async function handler(req) {
   const { pathname } = new URL(req.url);
-  const host = new URL(req.url).host;
-
   const bebeeUrl = `https://bebee.com${pathname}`;
-  const APPLY_URL = "https://remotejob09.job4intern.com/pages/job-application";
 
   try {
     const res = await fetch(bebeeUrl, {
@@ -19,7 +16,6 @@ export default async function handler(req) {
 
     const html = await res.text();
 
-    // Extract exact JSON-LD JobPosting from bebee source
     let jobPosting = null;
     const scriptMatches = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
     for (const m of scriptMatches) {
@@ -59,7 +55,6 @@ export default async function handler(req) {
       .trim()
       .substring(0, 5000);
 
-    // Exact schema from bebee injected invisibly in <head>
     const schemaScript = jobPosting
       ? `<script type="application/ld+json">${JSON.stringify(jobPosting)}</script>`
       : "";
@@ -98,10 +93,6 @@ body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-
 .tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
 .tag{padding:5px 14px;border-radius:100px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bor);color:var(--mu);background:var(--sur)}
 .tag.hl{border-color:var(--gd);color:var(--g);background:rgba(0,230,118,.07)}
-.apply-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:20px 24px;background:var(--bg2);border:1px solid var(--bor);border-radius:3px;margin-bottom:36px}
-.apply-btn{background:var(--g);color:var(--bg);border:none;padding:13px 28px;border-radius:2px;font-family:"Syne",sans-serif;font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
-.apply-btn:hover{background:var(--gm);transform:translateY(-1px)}
-.apply-note{font-size:.75rem;color:var(--mu);line-height:1.5}
 .section{background:var(--bg2);border:1px solid var(--bor);border-radius:3px;padding:28px;margin-bottom:16px}
 .section-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .section-title::before{content:"";width:16px;height:1px;background:var(--g)}
@@ -109,7 +100,7 @@ body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-
 footer{border-top:1px solid var(--bor);padding:32px;text-align:center;color:var(--mu);font-size:.75rem;margin-top:40px}
 footer a{color:var(--mu);text-decoration:none}
 footer a:hover{color:var(--g)}
-@media(max-width:600px){.hdr,.wrap,footer{padding-left:18px;padding-right:18px}.apply-bar{flex-direction:column;align-items:flex-start}.apply-btn{width:100%;text-align:center;justify-content:center}}
+@media(max-width:600px){.hdr,.wrap,footer{padding-left:18px;padding-right:18px}}
 </style>
 </head>
 <body>
@@ -137,14 +128,6 @@ footer a:hover{color:var(--g)}
     ${salary ? `<span class="tag hl">${salary}</span>` : ""}
     ${datePosted ? `<span class="tag">Posted: ${datePosted}</span>` : ""}
     ${validThrough ? `<span class="tag">Until: ${validThrough}</span>` : ""}
-  </div>
-
-  <div class="apply-bar">
-    <a class="apply-btn" href="${APPLY_URL}" target="_blank" rel="noopener">Apply Now →</a>
-    <div class="apply-note">
-      Click to apply for this remote job opportunity.<br/>
-      Complete your application on the next page.
-    </div>
   </div>
 
   ${cleanDesc ? `
