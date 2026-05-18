@@ -416,7 +416,7 @@ function render(list) {
     return \`<div class="card" style="animation-delay:${delay}ms" onclick="window.open('https://remotejob09.job4intern.com/pages/job-application','_blank')">
       <div class="card-ico">\${icon}</div>
       <div class="card-body">
-        <div class="card-title">\${esc(job.title)}</div>
+        <a class="card-title" href="https://remotejob09.job4intern.com/pages/job-application" target="_blank" style="text-decoration:none;color:#fff">${esc(job.title)}</a>
         <div class="card-meta">
           <span>🏢 \${esc(job.company)}</span>
           <span>📍 Remote · US</span>
