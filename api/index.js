@@ -1,230 +1,154 @@
-export const config = { runtime: "edge" };
+export const config = { runtime: "edge", maxDuration: 15 };
 
 export default async function handler(req) {
-  const html = getPage();
-  return new Response(html, {
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
-}
+  const { pathname } = new URL(req.url);
+  const bebeeUrl = `https://bebee.com${pathname}`;
+  const APPLY_URL = "https://remotejob09.job4intern.com/pages/job-application";
 
-function getPage() {
-  return [
-    '<!DOCTYPE html>',
-    '<html lang="en">',
-    '<head>',
-    '<meta charset="UTF-8"/>',
-    '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>',
-    '<title>Unique Jobs \u2014 US Remote Jobs</title>',
-    '<meta name="description" content="Thousands of US remote jobs updated daily. Find your next role."/>',
-    '<link rel="preconnect" href="https://fonts.googleapis.com"/>',
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>',
-    '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>',
-    '<style>',
-    '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}',
-    ':root{--g:#00e676;--gm:#00c853;--gd:#007a33;--bg:#070d09;--bg2:#0c1510;--sur:#111d14;--bor:#1a2e1e;--tx:#e4f0e6;--mu:#5a8060}',
-    'html{scroll-behavior:smooth}',
-    'body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-weight:300}',
-    '.hdr{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,13,9,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bor)}',
-    '.hdr-logo{font-family:"Syne",sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.03em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}',
-    '.hdr-dot{width:8px;height:8px;background:var(--g);border-radius:50%;flex-shrink:0;animation:blink 2s ease-in-out infinite}',
-    '@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}',
-    '.hdr-right{display:flex;align-items:center;gap:12px}',
-    '.hdr-pill{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);border:1px solid var(--bor);padding:5px 14px;border-radius:100px}',
-    '.hdr-count{font-family:"Syne",sans-serif;font-weight:700;font-size:.72rem;color:var(--g);background:rgba(0,230,118,.1);border:1px solid var(--gd);padding:5px 14px;border-radius:100px}',
-    '.hero{padding:112px 32px 52px;max-width:1160px;margin:0 auto;border-bottom:1px solid var(--bor)}',
-    '.hero-tag{display:inline-flex;align-items:center;gap:8px;background:var(--sur);border:1px solid var(--bor);padding:5px 16px;border-radius:100px;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--g);margin-bottom:24px}',
-    '.hero-tag-dot{width:5px;height:5px;background:var(--g);border-radius:50%}',
-    '.hero h1{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(2.6rem,6vw,5rem);line-height:.96;letter-spacing:-.04em;color:#fff;margin-bottom:18px}',
-    '.hero h1 em{font-style:normal;color:var(--g)}',
-    '.hero-sub{color:var(--mu);font-size:.95rem;line-height:1.7;max-width:440px;margin-bottom:32px}',
-    '.search-bar{display:flex;gap:8px;max-width:600px;flex-wrap:wrap}',
-    '.search-bar input{flex:1;min-width:200px;background:var(--sur);border:1px solid var(--bor);color:var(--tx);padding:13px 18px;border-radius:2px;font-size:.88rem;font-family:"DM Sans",sans-serif;outline:none;transition:border-color .2s}',
-    '.search-bar input::placeholder{color:var(--mu)}',
-    '.search-bar input:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(0,230,118,.08)}',
-    '.search-bar button{background:var(--g);color:var(--bg);border:none;padding:13px 26px;border-radius:2px;cursor:pointer;font-family:"Syne",sans-serif;font-weight:800;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;transition:all .2s;white-space:nowrap}',
-    '.search-bar button:hover{background:var(--gm);transform:translateY(-1px)}',
-    '.wrap{max-width:1160px;margin:0 auto;padding:0 32px 80px;display:flex;gap:28px}',
-    '.side{width:220px;flex-shrink:0;padding-top:32px;position:sticky;top:80px;height:fit-content}',
-    '.side-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:14px;display:flex;align-items:center;gap:8px}',
-    '.side-title::before{content:"";width:18px;height:1px;background:var(--g)}',
-    '.side-btn{display:block;width:100%;text-align:left;background:transparent;border:1px solid var(--bor);color:var(--mu);padding:8px 13px;border-radius:2px;font-size:.76rem;cursor:pointer;transition:all .2s;margin-bottom:5px;font-family:"DM Sans",sans-serif}',
-    '.side-btn:hover,.side-btn.on{background:var(--sur);border-color:var(--gd);color:var(--g)}',
-    '.side-sep{height:1px;background:var(--bor);margin:16px 0}',
-    '.page-label{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:10px}',
-    '.pg-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:32px;background:var(--bg2);border:1px solid var(--bor);color:var(--mu);border-radius:2px;cursor:pointer;font-family:"Syne",sans-serif;font-weight:700;font-size:.72rem;transition:all .2s;margin:0 3px 5px 0}',
-    '.pg-btn:hover,.pg-btn.on{background:var(--g);color:var(--bg);border-color:var(--g)}',
-    '.jobs-panel{flex:1;min-width:0;padding-top:32px}',
-    '.jobs-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}',
-    '.jobs-bar-info{font-size:.76rem;color:var(--mu)}',
-    '.jobs-bar-info b{color:var(--tx);font-weight:500}',
-    '.sort-sel{background:var(--sur);border:1px solid var(--bor);color:var(--tx);padding:7px 12px;border-radius:2px;font-size:.76rem;font-family:"DM Sans",sans-serif;outline:none;cursor:pointer}',
-    '.sort-sel:focus{border-color:var(--g)}',
-    '.card{background:var(--bg2);border:1px solid var(--bor);border-radius:3px;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:all .2s;cursor:default;position:relative;overflow:hidden;margin-bottom:8px;animation:fadeUp .35s ease both}',
-    '.card::after{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--g);transform:scaleY(0);transition:transform .2s;transform-origin:bottom}',
-    '.card:hover{border-color:var(--gd);background:var(--sur)}',
-    '.card:hover::after{transform:scaleY(1)}',
-    '@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}',
-    '.card-ico{width:44px;height:44px;border-radius:8px;flex-shrink:0;background:var(--sur);border:1px solid var(--bor);display:flex;align-items:center;justify-content:center;font-size:1.2rem}',
-    '.card-body{flex:1;min-width:0}',
-    '.card-title{font-family:"Syne",sans-serif;font-weight:700;font-size:.9rem;color:#fff;margin-bottom:5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.card-meta{display:flex;gap:14px;flex-wrap:wrap}',
-    '.card-meta span{font-size:.69rem;color:var(--mu);display:flex;align-items:center;gap:4px}',
-    '.card-right{display:flex;align-items:center;gap:10px;flex-shrink:0}',
-    '.badge{padding:3px 10px;border-radius:100px;font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bor);color:var(--mu);background:var(--sur)}',
-    '.badge.new{border-color:var(--gd);color:var(--g);background:rgba(0,230,118,.07)}',
-    '.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:14px}',
-    '.spin{width:34px;height:34px;border:2px solid var(--bor);border-top-color:var(--g);border-radius:50%;animation:spin .75s linear infinite}',
-    '@keyframes spin{to{transform:rotate(360deg)}}',
-    '.spin-txt{color:var(--mu);font-size:.82rem}',
-    '.empty{text-align:center;padding:60px 20px;color:var(--mu)}',
-    '.empty-ico{font-size:2.2rem;margin-bottom:12px;opacity:.3}',
-    '.err{text-align:center;padding:40px;color:#e57373;font-size:.85rem}',
-    '.marq{overflow:hidden;border-top:1px solid var(--bor);border-bottom:1px solid var(--bor);padding:14px 0;background:var(--bg2)}',
-    '.marq-track{display:flex;width:max-content;animation:marq 30s linear infinite}',
-    '.marq-item{padding:0 36px;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mu);white-space:nowrap;display:flex;align-items:center;gap:18px}',
-    '.marq-item::after{content:"\u2736";color:var(--g);font-size:.55rem}',
-    '@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}',
-    '@media(max-width:860px){.side{display:none}}',
-    '@media(max-width:600px){.hdr{padding:0 18px}.hero{padding:96px 18px 40px}.wrap{padding:0 18px 60px}.card{flex-wrap:wrap}.card-right{width:100%}}',
-    '</style>',
-    '</head>',
-    '<body>',
-    '<header class="hdr">',
-    '  <a href="/" class="hdr-logo"><span class="hdr-dot"></span>Unique Jobs</a>',
-    '  <div class="hdr-right">',
-    '    <span class="hdr-pill">\ud83c\uddfa\ud83c\uddf8 US Remote</span>',
-    '    <span class="hdr-count" id="hdrCount">Loading...</span>',
-    '  </div>',
-    '</header>',
-    '<div class="hero">',
-    '  <div class="hero-tag"><span class="hero-tag-dot"></span>Live from BeBee Sitemap</div>',
-    '  <h1>Find your next<br/><em>remote job.</em></h1>',
-    '  <p class="hero-sub">Real US remote jobs pulled directly from BeBee\'s sitemap. Updated every 30 minutes. No noise.</p>',
-    '  <div class="search-bar">',
-    '    <input id="q" type="text" placeholder="Title, skill, or company\u2026" />',
-    '    <button onclick="search()">Search</button>',
-    '  </div>',
-    '</div>',
-    '<div class="marq"><div class="marq-track">',
-    '<span class="marq-item">Engineering</span><span class="marq-item">Design</span>',
-    '<span class="marq-item">Marketing</span><span class="marq-item">Product</span>',
-    '<span class="marq-item">Finance</span><span class="marq-item">Sales</span>',
-    '<span class="marq-item">Data &amp; AI</span><span class="marq-item">DevOps</span>',
-    '<span class="marq-item">Healthcare</span><span class="marq-item">Legal</span>',
-    '<span class="marq-item">Customer Success</span><span class="marq-item">Operations</span>',
-    '<span class="marq-item">Engineering</span><span class="marq-item">Design</span>',
-    '<span class="marq-item">Marketing</span><span class="marq-item">Product</span>',
-    '<span class="marq-item">Finance</span><span class="marq-item">Sales</span>',
-    '<span class="marq-item">Data &amp; AI</span><span class="marq-item">DevOps</span>',
-    '<span class="marq-item">Healthcare</span><span class="marq-item">Legal</span>',
-    '<span class="marq-item">Customer Success</span><span class="marq-item">Operations</span>',
-    '</div></div>',
-    '<div class="wrap">',
-    '  <aside class="side">',
-    '    <div class="side-title">Categories</div>',
-    '    <button class="side-btn on" onclick="cat(this,\'\')">All Jobs</button>',
-    '    <button class="side-btn" onclick="cat(this,\'engineer\')">Engineering</button>',
-    '    <button class="side-btn" onclick="cat(this,\'developer\')">Developer</button>',
-    '    <button class="side-btn" onclick="cat(this,\'designer\')">Design</button>',
-    '    <button class="side-btn" onclick="cat(this,\'marketing\')">Marketing</button>',
-    '    <button class="side-btn" onclick="cat(this,\'product\')">Product</button>',
-    '    <button class="side-btn" onclick="cat(this,\'manager\')">Management</button>',
-    '    <button class="side-btn" onclick="cat(this,\'sales\')">Sales</button>',
-    '    <button class="side-btn" onclick="cat(this,\'data\')">Data &amp; AI</button>',
-    '    <button class="side-btn" onclick="cat(this,\'finance\')">Finance</button>',
-    '    <button class="side-btn" onclick="cat(this,\'customer\')">Customer Success</button>',
-    '    <button class="side-btn" onclick="cat(this,\'nurse\')">Healthcare</button>',
-    '    <button class="side-btn" onclick="cat(this,\'devops\')">DevOps</button>',
-    '    <div class="side-sep"></div>',
-    '    <div class="page-label">Sitemap Page</div>',
-    '    <div id="pgBtns"></div>',
-    '  </aside>',
-    '  <div class="jobs-panel">',
-    '    <div class="jobs-bar">',
-    '      <div class="jobs-bar-info" id="barInfo">Loading jobs\u2026</div>',
-    '      <select class="sort-sel" id="sortSel" onchange="sortJobs(this.value)">',
-    '        <option value="date">Newest First</option>',
-    '        <option value="alpha">A \u2192 Z</option>',
-    '      </select>',
-    '    </div>',
-    '    <div id="grid"><div class="loading"><div class="spin"></div><div class="spin-txt">Fetching latest US jobs\u2026</div></div></div>',
-    '  </div>',
-    '</div>',
-    '<script>',
-    'var curPage=1,curQ="",curCat="",jobs=[],sortMode="date";',
-    'var ICONS=["\\ud83d\\udcbc","\\ud83d\\ude80","\\ud83d\\udca1","\\ud83c\\udfaf","\\u26a1","\\ud83d\\udd27","\\ud83d\\udcca","\\ud83c\\udf10","\\ud83c\\udfa8","\\ud83d\\udd2c","\\ud83d\\udcf1","\\ud83c\\udfd7\\ufe0f"];',
-    'buildPageBtns();load(1,"");',
-    'document.getElementById("q").addEventListener("keydown",function(e){if(e.key==="Enter")search();});',
-    'function buildPageBtns(){',
-    '  var el=document.getElementById("pgBtns");',
-    '  el.innerHTML=Array.from({length:10},function(_,i){',
-    '    return \'<button class="pg-btn\'+(i===0?\' on\':\'\')+\'" id="pg\'+(i+1)+\'" onclick="goPage(\'+(i+1)+\')">\'+(i+1)+\'</button>\';',
-    '  }).join("");',
-    '}',
-    'function search(){',
-    '  curQ=document.getElementById("q").value.trim();curCat="";',
-    '  document.querySelectorAll(".side-btn").forEach(function(b){b.classList.remove("on");});',
-    '  document.querySelector(".side-btn").classList.add("on");',
-    '  load(curPage,curQ);',
-    '}',
-    'function cat(btn,term){',
-    '  document.querySelectorAll(".side-btn").forEach(function(b){b.classList.remove("on");});',
-    '  btn.classList.add("on");curCat=term;curQ=term;',
-    '  document.getElementById("q").value=term;load(curPage,term);',
-    '}',
-    'function goPage(p){',
-    '  curPage=p;',
-    '  document.querySelectorAll(".pg-btn").forEach(function(b,i){b.classList.toggle("on",i+1===p);});',
-    '  load(p,curQ);window.scrollTo({top:0,behavior:"smooth"});',
-    '}',
-    'function sortJobs(mode){sortMode=mode;render(jobs);}',
-    'async function load(page,q){',
-    '  var grid=document.getElementById("grid");',
-    '  grid.innerHTML=\'<div class="loading"><div class="spin"></div><div class="spin-txt">Fetching page \'+page+\'…</div></div>\';',
-    '  try{',
-    '    var r=await fetch("/api/jobs?page="+page+"&q="+encodeURIComponent(q));',
-    '    var d=await r.json();',
-    '    if(d.error)throw new Error(d.error);',
-    '    jobs=d.jobs||[];',
-    '    document.getElementById("hdrCount").textContent=jobs.length+" jobs";',
-    '    document.getElementById("barInfo").innerHTML="<b>"+jobs.length+" jobs</b>"+(q?\' matching <em>"\'+esc(q)+\'"</em>\':" on page "+page);',
-    '    render(jobs);',
-    '  }catch(e){',
-    '    grid.innerHTML=\'<div class="err">\u26a0 Could not load jobs: \'+esc(e.message)+\'<br/><small>BeBee sitemap may be temporarily unavailable.</small></div>\';',
-    '    document.getElementById("hdrCount").textContent="Error";',
-    '  }',
-    '}',
-    'function render(list){',
-    '  var grid=document.getElementById("grid");',
-    '  var sorted=[...list].sort(function(a,b){',
-    '    if(sortMode==="alpha")return a.title.localeCompare(b.title);',
-    '    return(b.lastmod||"").localeCompare(a.lastmod||"");',
-    '  });',
-    '  if(!sorted.length){grid.innerHTML=\'<div class="empty"><div class="empty-ico">\ud83d\udd0d</div>No jobs found.<br/>Try another category or page.</div>\';return;}',
-    '  var now=Date.now();',
-    '  grid.innerHTML=sorted.map(function(job,i){',
-    '    var isNew=job.lastmod&&(now-new Date(job.lastmod).getTime())<7*86400000;',
-    '    var icon=ICONS[i%ICONS.length];',
-    '    var date=job.lastmod?new Date(job.lastmod).toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"Recent";',
-    '    var delay=Math.min(i*25,400);',
-    '    var badgeCls=isNew?"badge new":"badge";',
-    '    var badgeTxt=isNew?"New":"Remote";',
-    '    return \'<div class="card" style="animation-delay:\'+delay+\'ms">\'',
-    '      +\'<div class="card-ico">\'+icon+\'</div>\'',
-    '      +\'<div class="card-body">\'',
-    '      +\'<div class="card-title">\'+esc(job.title)+\'</div>\'',
-    '      +\'<div class="card-meta">\'',
-    '      +\'<span>\ud83c\udfe2 \'+esc(job.company)+\'</span>\'',
-    '      +\'<span>\ud83d\udccd Remote \xb7 US</span>\'',
-    '      +\'<span>\ud83d\udd50 \'+date+\'</span>\'',
-    '      +\'</div></div>\'',
-    '      +\'<div class="card-right"><span class="\'+badgeCls+\'">\'+badgeTxt+\'</span></div>\'',
-    '      +\'</div>\';',
-    '  }).join("");',
-    '}',
-    'function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}',
-    '<\/script>',
-    '</body>',
-    '</html>'
-  ].join('\n');
+  try {
+    const res = await fetch(bebeeUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1)",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+      },
+      redirect: "follow",
+    });
+
+    const html = await res.text();
+
+    let jobPosting = null;
+    const scriptMatches = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)];
+    for (const m of scriptMatches) {
+      try {
+        const parsed = JSON.parse(m[1].trim());
+        if (parsed["@type"] === "JobPosting") { jobPosting = parsed; break; }
+        if (parsed["@graph"]) {
+          const found = parsed["@graph"].find(x => x["@type"] === "JobPosting");
+          if (found) { jobPosting = found; break; }
+        }
+      } catch(e) {}
+    }
+
+    const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+    const descMatch  = html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']+)["']/i);
+
+    const title        = jobPosting?.title || jobPosting?.name || titleMatch?.[1]?.replace(/ \| BeBee.*/, "") || "Job Posting";
+    const company      = jobPosting?.hiringOrganization?.name || "BeBee";
+    const description  = jobPosting?.description || descMatch?.[1] || "";
+    const datePosted   = jobPosting?.datePosted || "";
+    const validThrough = jobPosting?.validThrough || "";
+    const empType      = Array.isArray(jobPosting?.employmentType)
+      ? jobPosting.employmentType.join(", ")
+      : (jobPosting?.employmentType || "");
+
+    const addr     = jobPosting?.jobLocation?.address || jobPosting?.jobLocation?.[0]?.address || {};
+    const location = [addr.addressLocality, addr.addressRegion, addr.addressCountry].filter(Boolean).join(", ") || "Remote · US";
+
+    const salaryVal = jobPosting?.baseSalary?.value;
+    const salary    = salaryVal
+      ? `${jobPosting.baseSalary.currency || "USD"} ${salaryVal.minValue || salaryVal.value || ""}${salaryVal.maxValue ? "–" + salaryVal.maxValue : ""} / ${(salaryVal.unitText || "").toLowerCase()}`
+      : "";
+
+    const cleanDesc = description
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .substring(0, 5000);
+
+    const schemaScript = jobPosting
+      ? `<script type="application/ld+json">${JSON.stringify(jobPosting)}</script>`
+      : "";
+
+    const page = [
+      '<!DOCTYPE html>',
+      '<html lang="en">',
+      '<head>',
+      '<meta charset="UTF-8"/>',
+      '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>',
+      '<title>' + title + ' \u2014 Unique Jobs</title>',
+      '<meta name="description" content="' + cleanDesc.substring(0, 160) + '"/>',
+      '<meta property="og:title" content="' + title + '"/>',
+      '<meta property="og:description" content="' + cleanDesc.substring(0, 200) + '"/>',
+      '<meta property="og:type" content="website"/>',
+      '<link rel="preconnect" href="https://fonts.googleapis.com"/>',
+      '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>',
+      '<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>',
+      schemaScript,
+      '<style>',
+      '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}',
+      ':root{--g:#00e676;--gm:#00c853;--gd:#007a33;--bg:#070d09;--bg2:#0c1510;--sur:#111d14;--bor:#1a2e1e;--tx:#e4f0e6;--mu:#5a8060}',
+      'body{background:var(--bg);color:var(--tx);font-family:"DM Sans",sans-serif;font-weight:300;min-height:100vh}',
+      '.hdr{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;padding:0 32px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,13,9,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bor)}',
+      '.hdr-logo{font-family:"Syne",sans-serif;font-weight:800;font-size:1.2rem;letter-spacing:-.03em;color:#fff;text-decoration:none;display:flex;align-items:center;gap:9px}',
+      '.hdr-dot{width:7px;height:7px;background:var(--g);border-radius:50%;animation:blink 2s infinite}',
+      '@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}',
+      '.hdr-back{font-size:.75rem;color:var(--mu);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s}',
+      '.hdr-back:hover{color:var(--g)}',
+      '.wrap{max-width:860px;margin:0 auto;padding:96px 32px 80px}',
+      '.breadcrumb{font-size:.72rem;color:var(--mu);margin-bottom:28px;display:flex;align-items:center;gap:8px}',
+      '.breadcrumb a{color:var(--mu);text-decoration:none;transition:color .2s}',
+      '.breadcrumb a:hover{color:var(--g)}',
+      '.breadcrumb span{opacity:.4}',
+      '.job-title{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.03em;color:#fff;line-height:1.15;margin-bottom:16px}',
+      '.job-company{font-size:1rem;color:var(--g);font-weight:500;margin-bottom:18px}',
+      '.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}',
+      '.tag{padding:5px 14px;border-radius:100px;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bor);color:var(--mu);background:var(--sur)}',
+      '.tag.hl{border-color:var(--gd);color:var(--g);background:rgba(0,230,118,.07)}',
+      '.apply-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:20px 24px;background:var(--bg2);border:1px solid var(--bor);border-radius:3px;margin-bottom:36px}',
+      '.apply-btn{background:var(--g);color:var(--bg);border:none;padding:13px 28px;border-radius:2px;font-family:"Syne",sans-serif;font-weight:800;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:8px}',
+      '.apply-btn:hover{background:var(--gm);transform:translateY(-1px)}',
+      '.apply-note{font-size:.75rem;color:var(--mu);line-height:1.5}',
+      '.section{background:var(--bg2);border:1px solid var(--bor);border-radius:3px;padding:28px;margin-bottom:16px}',
+      '.section-title{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--g);margin-bottom:16px;display:flex;align-items:center;gap:8px}',
+      '.section-title::before{content:"";width:16px;height:1px;background:var(--g)}',
+      '.desc{font-size:.9rem;line-height:1.85;color:var(--tx)}',
+      'footer{border-top:1px solid var(--bor);padding:32px;text-align:center;color:var(--mu);font-size:.75rem;margin-top:40px}',
+      'footer a{color:var(--mu);text-decoration:none}',
+      'footer a:hover{color:var(--g)}',
+      '@media(max-width:600px){.hdr,.wrap,footer{padding-left:18px;padding-right:18px}.apply-bar{flex-direction:column;align-items:flex-start}.apply-btn{width:100%;text-align:center;justify-content:center}}',
+      '</style>',
+      '</head>',
+      '<body>',
+      '<header class="hdr">',
+      '  <a href="/" class="hdr-logo"><span class="hdr-dot"></span>Unique Jobs</a>',
+      '  <a href="/" class="hdr-back">\u2190 Back to jobs</a>',
+      '</header>',
+      '<div class="wrap">',
+      '  <div class="breadcrumb">',
+      '    <a href="/">Home</a><span>/</span>',
+      '    <a href="/">Jobs</a><span>/</span>',
+      '    <span>' + title.substring(0, 60) + '</span>',
+      '  </div>',
+      '  <h1 class="job-title">' + title + '</h1>',
+      '  <div class="job-company">' + company + '</div>',
+      '  <div class="tags">',
+      empType ? '    <span class="tag hl">' + empType + '</span>' : '',
+      '    <span class="tag hl">Remote \xb7 US</span>',
+      location !== "Remote · US" ? '    <span class="tag">' + location + '</span>' : '',
+      salary ? '    <span class="tag hl">' + salary + '</span>' : '',
+      datePosted ? '    <span class="tag">Posted: ' + datePosted + '</span>' : '',
+      validThrough ? '    <span class="tag">Until: ' + validThrough + '</span>' : '',
+      '  </div>',
+      '  <div class="apply-bar">',
+      '    <a class="apply-btn" href="' + APPLY_URL + '" target="_blank" rel="noopener">Apply Now \u2192</a>',
+      '    <div class="apply-note">Click to apply for this remote job opportunity.<br/>Complete your application on the next page.</div>',
+      '  </div>',
+      cleanDesc ? '  <div class="section"><div class="section-title">Job Description</div><div class="desc">' + cleanDesc.replace(/\n/g, "<br/>") + '</div></div>' : '',
+      '</div>',
+      '<footer><a href="/">Unique Jobs</a> &bull; US Remote Jobs &bull; &copy; 2026</footer>',
+      '</body>',
+      '</html>'
+    ].join('\n');
+
+    return new Response(page, {
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+
+  } catch(e) {
+    return new Response(
+      '<html><body style="background:#070d09;color:#e4f0e6;font-family:sans-serif;padding:40px"><h1 style="color:#00e676">Error loading job</h1><p>' + e.message + '</p><a href="/" style="color:#00e676">\u2190 Back to jobs</a></body></html>',
+      { headers: { "content-type": "text/html; charset=utf-8" } }
+    );
+  }
 }
